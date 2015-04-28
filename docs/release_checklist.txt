@@ -1,0 +1,24 @@
+.. _release_checklist:
+
+*****************
+Release Checklist
+*****************
+
+
+1. Run ``python setup.py check``.
+2. Run ``py.test``.
+3. Update the version number
+
+  a) Update the Changelog (use ``git diff`` against the tag for the previous
+     version).
+  b) Update the version in `mrs/version.py`.
+  c) Commit to the Git repository.
+
+4. Tag the new commit with ``git tag vX.X``.
+5. Create and upload a release tarball with
+   ``python setup.py register sdist upload``.
+6. Upload the documentation with ``cd docs; make html`` and
+   ``python setup.py upload_docs``.
+7. Upload the tarball to Google Code.
+8. Send announcement email to the mrs-mapreduce@googlegroups.com mailing list.
+9. Announce on `Freecode <http://freecode.com>`_..

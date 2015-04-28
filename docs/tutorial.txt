@@ -1,0 +1,159 @@
+.. _tutorial:
+
+********
+Tutorial
+********
+
+.. _tutorial:
+
+Running in Parallel Manually
+================================
+
+This tutorial will walk you through the basic configurations and options of
+running Mrs in parallel.  If you followed the installation instructions,
+then you should have already run the example WordCount
+program in serial mode and so have verified that Mrs is installed and running
+correctly on your system. Otherwise, you may want to do that before proceeding.
+
+Start by opening two terminals, one for the master and one for the slave.
+In the slave terminal, ssh into the slave machine, and in both, navagate to the
+MRS_HOME/examples directory.
+
+Before running anything let's get familiar with the various options by
+running the *help* option. ::
+
+    > python wordcount.py --help
+
+Running this command should display a list of the available options. Take note
+of the -I IMPLEMENTATION option where IMPLEMENTATION could be Serial, Master,
+Slave or Bypass. This will be followed by options specific to the default
+implimentation which is serial. To access the options for the other
+implimentations you will need to specify which, as in: ::
+
+    > python wordcount.py -I Master -h
+
+Now, let's run our friendly WordCount program in the most simple configuration
+and afterwords explain some of the other options that you might want to use. To
+begin, start the Master. You will need to specify a port number and of course
+the input file and an output directory. Note that if you don't specify a port
+number, Mrs will automatically choose one, but you will need to run with the
+verbose option so it will print it out. You will probably want to run in verbose
+mode anyway. ::
+
+    > python wordcount.py -I Master -P 44555 --mrs-verbose mytxt.txt outDir
+
+Next, start the Slave. The slave needs to know where to report to the master,
+which you can specify with the -M HOST:PORT option. ::
+
+    > python wordcount.py -I Slave -M [masterName]:44555 --mrs-verbose
+
+And once again, if all went well, you should have the results in your outDir.
+
+
+.. _using-run-script:
+
+Using a Run Script
+==================
+
+Now that you have run Mrs manually and are familiar with the Mrs interface you
+are ready to start with the clusterrun.py run-script.  A run-script allows you
+to easily start
+the master and hundreds of slave machines all at once. We have included an
+example script in the MRS_HOME/examples directory. It is written in Python and
+uses the screen and pssh utilities. If you are not familiar with screen or pssh
+you might want to work through one of the many online tutorials or at least
+review their man pages before proceeding. You don't need to be an expert but it
+could be very helpful to know the basic commands for manipulating  a screen
+session such as creating, attaching/disattaching a screen session, and changing
+windows from within a session.
+
+The example run-script (clusterrun.py) is pretty well documented and of course
+you can print out the run options with the *help* command. ::
+
+    > python clusterrun.py --help
+
+To run the script you will need to modify the MRS_HOME/examples/slaves file.
+When the program is run the slaves file will be passed to the pssh program and
+should be a text file with the name of a slave machine on each line in the
+following format: ::
+
+         > [user@][host][:port]
+
+If the user name is left off, pssh will use the current user name, and for the
+port number, the ssh default will be used (port 22).
+
+You will also need to set up passphraseless ssh between the master and slave
+machines before running the script. Instructions for how to do this are easly
+found online.
+
+Finally once you have modified the slaves file and set up passphraseless ssh,
+you should be able to run it by passing it a host file, a mrs program and some
+input. ::
+
+    > python clusterrun.py --hosts slaves wordcount.py mytxt.txt outDir
+
+You can specify the job name with the - -jobname option, or if you don't
+specify, Mrs will default to 'newjob.'
+
+The examples directory also includes a run-script called fulton.py that
+submits a job to a PBS scheduler.  This script is customized for the
+Fulton Supercomputing Lab at BYU, so it will need to be modified for your
+particular use case. However, if you use a supercomputer with a batch
+scheduler, this example script should be a good starting point.
+
+
+Writing a MapReduce Program
+===========================
+
+The WordCount program shows a Mrs program in it's most simple form. In this
+tutorial, we will try to explain the basic format for a Mrs MapReduce program
+and some of the options for a more complex program.
+
+The basic format for a Mrs MapReduce program looks something like this ::
+
+    import mrs
+
+    class MrsProgram(mrs.MapReduce):
+        def map(key, value):
+            yield newkey, newvalue
+
+        def reduce(key, values):
+            yield newvalue
+
+    if __name__ == '__main__':
+        mrs.main(MrsProgram)
+
+Here we create a class that extends the MapReduce class in the `MRS_HOME/mrs/
+mapreduce.py <http://code.google.com/p/mrs-mapreduce/source/browse/mrs/map
+reduce.py>`_ file, and overrides only the required map and reduce functions.
+Note that the ``mrs.MapReduce`` class provides a convenient way to write a
+program, but MapReduce programs are not required to inherit from it.
+The last section of code (the ``if __name__ == '__main__':`` section) just
+passes the program to Mrs to run.
+
+In the map function in the WordCount program, we take in a chunk of
+text as the starting value, break it up into words and yield each word as a new
+key with a value of one (found one instance of that word). Then the reduce
+function sums all values associated with a particular key (word), and yields
+the result.
+
+But what if, instead to reading in just one textfile and counting the words as
+we've been doing, you had thousands of files that you needed to process? This is
+a little more complicated, so you would probably want to override the
+``input_data()`` function from mapreduce.py, by adding something like the
+following to your the WordCount program. (See `wordcount2.py
+<http://code.google.com/p/mrs-mapreduce/source/browse/examples/wordcount2.py>`_
+in the examples folder.) ::
+
+    def input_data(self, job):
+        if len(self.args) < 2:
+            print >>sys.stderr, "Requires input(s) and an output."
+            return None
+        inputs = []
+        f = open(self.args[0])
+        for line in f:
+            inputs.append(line[:-1])
+        return job.file_data(inputs)
+
+Now, you can just pass in a single file containing the path to each text file on
+a line of the input file, and it will read them all in.

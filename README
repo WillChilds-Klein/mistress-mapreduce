@@ -1,8 +1,5 @@
-# mistress-mapreduce
-an anonymizing fork of [mrs-mapreduce](https://code.google.com/p/mrs-mapreduce/)
-
-
-## Mrs MapReduce Documentation
+Mrs MapReduce Documentation
+===========================
 
 Mrs (pronounced "missus") is a lightweight implementation of MapReduce.  The
 name derives from the practice of referring to MapReduce programs by the title

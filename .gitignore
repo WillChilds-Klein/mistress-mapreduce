@@ -1,0 +1,11 @@
+build/*
+docs/build/*
+dist/*
+mrs_mapreduce.egg-info/*
+*.pyc
+*.swp
+mrs.job*
+.coverage
+.nfs*
+*.so
+*.class
