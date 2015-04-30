@@ -1,0 +1,14 @@
+input/aphrodis.txt
+input/gutenberg-12730.txt
+input/gutenberg-12731.txt
+input/gutenberg-12732.txt
+input/gutenberg-12734.txt
+input/gutenberg-12735.txt
+input/gutenberg-12736.txt
+input/gutenberg-12737.txt
+input/gutenberg-12738.txt
+input/gutenberg-12739.txt
+input/gutenberg-12740.txt
+input/gutenberg-12741.txt
+input/sherlock_holmes.txt
+input/ulysses.txt
