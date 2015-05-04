@@ -16,7 +16,7 @@ for machine in $machines; do
     eval $(docker-machine env $machine)
 
     # pull latest clean image
-    docker pull willck/mistress:latest & #| \
+    docker pull willck/mistress-mapreduce:latest & #| \
       #grep -i download | \
       #echo "${green}$machine:${none} $(cat -)" &
 done

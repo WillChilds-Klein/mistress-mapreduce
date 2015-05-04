@@ -15,8 +15,8 @@ echo "master: ${master}@${master_host}:${master_port}"
 docker-machine active $master && \
   eval $(docker-machine env $master)
 
-docker run -d --name master --net host willck/mistress:latest \
-        ${img_repo}${img_tag} scripts/local/local-run.sh \
+docker run -d --name master --net host willck/mistress-mapreduce:latest \
+        ${img_repo}${img_tag} scripts/run-job.sh \
               -i input_paths.txt -o output -t wordcount2-master.txt \
             wordcount2.py $master_port
 
@@ -31,8 +31,8 @@ for slave in $slaves; do
     eval $(docker-machine env $slave)
 
     # execute enslavement
-    docker run -d --name "slave${i}" --net host willck/mistress:latest \
-            ${img_repo}${img_tag} scripts/local/local-run.sh \
+    docker run -d --name "slave${i}" --net host willck/mistress-mapreduce:latest \
+            ${img_repo}${img_tag} scripts/run-job.sh \
               -s ${master_host} -t "wordcount2-slave${i}.txt" \
            wordcount2.py $master_port
 
