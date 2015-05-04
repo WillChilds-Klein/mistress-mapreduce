@@ -17,12 +17,11 @@ ENV PATH /usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 RUN mkdir -p /mistress-mapreduce \
     && git clone https://github.com/WillChilds-Klein/mistress-mapreduce.git /mistress-mapreduce \
     && mkdir -p /mistress-mapreduce/input \
-    && curl -SL https://dl.dropboxusercontent.com/u/19937132/enron-email-text.tar.gz
+    && curl -SL https://dl.dropboxusercontent.com/u/19937132/enron-email-text.tar.gz \
     | tar -xzC /mistress-mapreduce/input
 
-# set workdir and install code
+# set workdir, install code and  generate input_paths.txt
 WORKDIR /mistress-mapreduce
-RUN python ./setup.py install
+RUN python ./setup.py install \
+    scripts/generate_input_paths.sh
 
-# generate input_paths.txt
-RUN scripts/generate_input_paths.sh
