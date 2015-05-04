@@ -23,5 +23,5 @@ RUN mkdir -p /mistress-mapreduce \
 # set workdir, install code and  generate input_paths.txt
 WORKDIR /mistress-mapreduce
 RUN python ./setup.py install \
-    scripts/generate_input_paths.sh
+    && scripts/generate_input_paths.sh
 
