@@ -14,7 +14,7 @@ none="${esc}[0m";
 
 docker_host=${1-"local1"}
 img_repo="willck/mistress-mapreduce"
-tag=":local"
+img_tag=":local"
 
 master=${MISTRESS_MASTER:-"master"}
 master_host=${1:-"$(docker-machine ip $docker_host)"}
@@ -23,27 +23,27 @@ master_port=${MISTRESS_MASTER_PORT:-"8080"}
 # switch to scripts folder to avoid sending huge build 
 # context to docker daemon
 init_dir=$(pwd)
-mistress_dir= '/Users/will/work/classes/cpsc490/code/mistress-mapreduce'
-cd mistress_dir
+mistress_dir="/Users/will/work/classes/cpsc490/code/mistress-mapreduce"
+cd ${mistress_dir}
 
 
 # swich to local docker host
 docker-machine active $docker_host && \
-  eval $(docker-machine env $docker_host)
+  eval $(docker-machine env ${docker_host})
 echo "${blue}HOST MACHINE${none}: $(docker-machine active)"
-printf "${green}DOCKER ENV${none}:\n $(docker env)\n\n"
+printf "${green}DOCKER ENV${none}:\n $(docker-machine env)\n\n"
 
 # build image
 echo "BUILDING DOCKER IMAGE"
-docker build -f "${mistress_dir}/sripts/local/Dockerfile.local" \
-             -t ${img_repo}${tag} \
+docker build -f "${mistress_dir}/scripts/local/Dockerfile.local" \
+             -t ${img_repo}${img_tag} \
          ${mistress_dir} \
            && printf "\n\nBUILD ${green}SUCCESS${none}\n\n" \
            || printf "\n\nBUILD ${red}FAILURE${none}\n\n"
 
 # remove all existing containers
 containers=$(docker ps -aq | xargs)
-for container in ${container}s; do
+for container in ${containers}; do
     echo "${red}KILLING CONTAINER${none} ${container}"
     docker kill ${container}
     docker rm --force ${container}
@@ -59,8 +59,9 @@ echo "${blue}RUNNING${none} MASTER"
 docker run -d --name master --net host \
              -v "${mistress_dir}/:/mistress-mapreduce/" \
              -w /mistress-mapreduce \
-         ${img_repo}${img_tag} ${mistress_dir}/scripts/local/local-run.sh \
-             -t wordcount2-master.txt wordcount2.py input_paths.txt output $master_port
+         ${img_repo}${img_tag} scripts/local/local-run.sh \
+              -i input_paths.txt -o output -t wordcount2-master.txt \
+            wordcount2.py $master_port
 
 printf "\n\n"
 sleep 3
@@ -70,8 +71,9 @@ echo "${blue}RUNNING${none} SLAVE"
 docker run -d --name slave --net host \
              -v "${mistress_dir}/:/mistress-mapreduce/" \
              -w /mistress-mapreduce \
-         ${img_repo}${img_tag} ${mistress_dir}/scripts/local/local-run.sh \
-             -t wordcount2-slave.txt wordcount2.py $master_host $master_port 
+         ${img_repo}${img_tag} scripts/local/local-run.sh \
+             -s ${master_host} -t wordcount2-slave.txt \
+           wordcount2.py $master_port 
 
 printf "\n\n${blue}DONE${none}!\n\n"
 

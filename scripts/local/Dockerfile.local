@@ -1,8 +1,6 @@
-FROM willck/mistress:base
+FROM ubuntu
 
 MAINTAINER Will Childs-Klein <will.childsklein@gmail.com>
-
-
 
 # install dependencies and a few tools
 RUN apt-get update
@@ -12,9 +10,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     curl \
     git
 
-# fine ALL the bins
+# find ALL the bins
 ENV PATH /usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 
 # install code
-#WORKDIR /mistress-mapreduce
-CMD python /mistress-mapreduce/setup.py install
+CMD python /mistress-mapreduce/setup.py install \
+    scripts/generate_input_paths.sh

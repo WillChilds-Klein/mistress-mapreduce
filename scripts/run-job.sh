@@ -45,8 +45,8 @@ timing_file="timer/$([ -z $timing_file ] \
                         || echo $timing_file)"
 
 
-echo python $job -I $role $([ $role = Master ] \
-                                && echo -n "-P ${port} ${input_file} ${output_dir}" \
-                                || echo -n "-M ${master_host}:${port}") \
+python $job -I $role $([ $role = Master ] \
+                        && echo -n "-P ${port} ${input_file} ${output_dir}" \
+                        || echo -n "-M ${master_host}:${port}") \
         --mrs-timing-file ${timing_file} \
         --mrs-verbose
