@@ -73,7 +73,7 @@ docker run -d --name slave --net host \
              -w /mistress-mapreduce \
          ${img_repo}${img_tag} scripts/local/local-run.sh \
              -s ${master_host} -t wordcount2-slave.txt \
-           wordcount2.py $master_port 
+           wordcount2.py $master_port
 
 printf "\n\n${blue}DONE${none}!\n\n"
 

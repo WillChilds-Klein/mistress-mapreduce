@@ -16,7 +16,9 @@ docker-machine active $master && \
   eval $(docker-machine env $master)
 
 docker run -d --name master --net host willck/mistress:latest \
-           scripts/run-job.sh -t wordcount2-master.txt -i input_paths.txt -o output wordcount2.py $master_port
+        ${img_repo}${img_tag} scripts/local/local-run.sh \
+              -i input_paths.txt -o output -t wordcount2-master.txt \
+            wordcount2.py $master_port
 
 
 slaves=$(docker-machine ls -q | grep remote | xargs)
@@ -30,7 +32,9 @@ for slave in $slaves; do
 
     # execute enslavement
     docker run -d --name "slave${i}" --net host willck/mistress:latest \
-           scripts/run-job.sh -t "wordcount2-slave${i}.txt" -s $master_host wordcount2.py $master_port
+            ${img_repo}${img_tag} scripts/local/local-run.sh \
+              -s ${master_host} -t "wordcount2-slave${i}.txt" \
+           wordcount2.py $master_port
 
     ((i++))
 done
