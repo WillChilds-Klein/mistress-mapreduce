@@ -55,5 +55,5 @@ for machine in $machines; do
         #docker rmi --force $image
     #done
 
-    docker images $opts | xargs docker rmi
+    docker images $opts | xargs docker rmi --force
 done
