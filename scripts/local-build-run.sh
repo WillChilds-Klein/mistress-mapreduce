@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-usage="usage: $0 [local_master=local1]"
+usage="usage: $0 [local_master=local]"
 if [[ $# -gt 2 ]]; then
     echo $usage
     exit 1
@@ -12,19 +12,17 @@ green="${esc}[32m";
 blue="${esc}[34m";
 none="${esc}[0m";
 
-docker_host=${1-"local1"}
+docker_host=${1-"local"}
 img_repo="willck/mistress-mapreduce"
-img_tag=":local"
+img_tag="local"
 
 master=${MISTRESS_MASTER:-"master"}
 master_host=${1:-"$(docker-machine ip $docker_host)"}
 master_port=${MISTRESS_MASTER_PORT:-"8080"}
 
-# switch to scripts folder to avoid sending huge build 
-# context to docker daemon
+# switch to mistress-mapreduce dir
 init_dir=$(pwd)
 mistress_dir="/Users/will/work/classes/cpsc490/code/mistress-mapreduce"
-cd ${mistress_dir}
 
 
 # swich to local docker host
@@ -32,14 +30,6 @@ docker-machine active $docker_host && \
   eval $(docker-machine env ${docker_host})
 echo "${blue}HOST MACHINE${none}: $(docker-machine active)"
 printf "${green}DOCKER ENV${none}:\n $(docker-machine env)\n\n"
-
-# build image
-echo "BUILDING DOCKER IMAGE"
-docker build -f "${mistress_dir}/scripts/local/Dockerfile.local" \
-             -t ${img_repo}${img_tag} \
-         ${mistress_dir} \
-           && printf "\n\nBUILD ${green}SUCCESS${none}\n\n" \
-           || printf "\n\nBUILD ${red}FAILURE${none}\n\n"
 
 # remove all existing containers
 containers=$(docker ps -aq | xargs)
@@ -51,27 +41,31 @@ done
 
 printf "\n\n"
 
-# cd to mistress-mapreduce root dir to grab input files at runtime
-cd ${mistress_dir}
+# build image
+echo "BUILDING DOCKER IMAGE"
+docker build -t ${img_repo}:${img_tag}  \
+         ${mistress_dir} \
+           && printf "\n\nBUILD ${green}SUCCESS${none}\n\n" \
+           || printf "\n\nBUILD ${red}FAILURE${none}\n\n"
+
+printf "\n\n"
 
 # run master
 echo "${blue}RUNNING${none} MASTER"
 docker run -d --name master --net host \
-             -v "${mistress_dir}/:/mistress-mapreduce/" \
-             -w /mistress-mapreduce \
-         ${img_repo}${img_tag} scripts/local/local-run.sh \
+           -v ${mistress_dir}:/mistress-mapreduce \
+         ${img_repo}:${img_tag} scripts/run-job.sh \
               -i input_paths.txt -o output -t wordcount2-master.txt \
             wordcount2.py $master_port
 
 printf "\n\n"
-sleep 3
+sleep 10
 
 # run slave
 echo "${blue}RUNNING${none} SLAVE"
 docker run -d --name slave --net host \
-             -v "${mistress_dir}/:/mistress-mapreduce/" \
-             -w /mistress-mapreduce \
-         ${img_repo}${img_tag} scripts/local/local-run.sh \
+           -v ${mistress_dir}:/mistress-mapreduce \
+         ${img_repo}:${img_tag} scripts/run-job.sh \
              -s ${master_host} -t wordcount2-slave.txt \
            wordcount2.py $master_port
 

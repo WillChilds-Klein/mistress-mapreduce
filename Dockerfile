@@ -14,10 +14,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
 ENV PATH /usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 
 # clone code repo and pull data
-RUN git clone https://github.com/WillChilds-Klein/mistress-mapreduce.git /mistress-mapreduce \
-    && mkdir -p /mistress-mapreduce/input  \
-             /mistress-mapreduce/output    \
-             /mistress-mapreduce/timer     \
+RUN mkdir -p /mistress-mapreduce \
+    && git clone https://github.com/WillChilds-Klein/mistress-mapreduce.git /mistress-mapreduce \
+    && mkdir /mistress-mapreduce/input  \
+             /mistress-mapreduce/output \
+             /mistress-mapreduce/timer  \
     && curl -SL https://dl.dropboxusercontent.com/u/19937132/enron-email-text.tar.gz \
     | tar -xzC /mistress-mapreduce/input
 
@@ -25,4 +26,3 @@ RUN git clone https://github.com/WillChilds-Klein/mistress-mapreduce.git /mistre
 WORKDIR /mistress-mapreduce
 RUN python ./setup.py install \
     && scripts/generate_input_paths.sh
-
