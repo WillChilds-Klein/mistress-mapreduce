@@ -40,7 +40,7 @@ done
 shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
 
-machines=$(docker-machine ls -q)
+machines=$(docker-machine ls -q | grep -e 'remote*|master')
 
 for machine in $machines; do
     echo "${blue}DELETING $([ $rm_all -eq 1 ] && printf "${red}ALL" || printf "${green}RECENT")${blue} IMAGES ON MACHINE: ${yellow}$machine${none}"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## pull-all.sh
 
-machines=$(docker-machine ls -q | xargs)
+machines=$(docker-machine ls -q | grep -e '^[remote][master]*' | xargs)
 echo "machines: $machines"
 
 esc=$(printf '\033');

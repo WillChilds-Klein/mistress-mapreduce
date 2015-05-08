@@ -13,6 +13,8 @@ yellow="${esc}[33m";
 blue="${esc}[34m";
 none="${esc}[0m";
 
+datetime=$(date +%Y-%m-%d.%H:%M:%S)
+
 img_repo="willck/mistress-mapreduce"
 img_tag="latest"
 
@@ -26,13 +28,12 @@ docker-machine active $master && \
   eval $(docker-machine env $master)
 
 docker run -d --name master --net host \
-           #-v /mistress-mapreduce:/mistress-mapreduce \
         ${img_repo}:${img_tag} scripts/run-job.sh \
-            -i input_paths.txt -o output -t wordcount2-master.txt \
+            -i input_paths.txt -o output -t master-wordcount2-${datetime}.txt \
            wordcount2.py $master_port
 
 
-slaves=$(docker-machine ls -q | grep remote | xargs)
+slaves=$(docker-machine ls -q | grep -e '^remote' | xargs)
 echo "slaves: $slaves"
 
 ((i = 1))
@@ -43,9 +44,8 @@ for slave in $slaves; do
 
     # execute enslavement
     docker run -d --name "slave${i}" --net host \
-               #-v /mistress-mapreduce:/mistress-mapreduce \
             ${img_repo}:${img_tag} scripts/run-job.sh \
-                -s ${master_host} -t "wordcount2-slave${i}.txt" \
+            -s ${master_host} -t "slave${i}-wordcount2-${datetime}.txt" \
                wordcount2.py $master_port
 
     ((i++))

@@ -25,7 +25,7 @@ done
 shift $((OPTIND-1))
 
 
-machines=$(docker-machine ls -q)
+machines=$(docker-machine ls -q | grep -e '^[remote][master]*')
 
 for machine in $machines; do
     docker-machine active $machine

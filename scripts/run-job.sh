@@ -48,5 +48,24 @@ timing_file="timer/$([ -z $timing_file ] \
 python $job -I $role $([ $role = Master ] \
                         && echo -n "-P ${port} ${input_file} ${output_dir}" \
                         || echo -n "-M ${master_host}:${port}") \
-        --mrs-timing-file ${timing_file} \
-        --mrs-verbose
+        --mrs-timing-file ${timing_file} --mrs-profile --mrs-verbose
+
+echo "${green}OUTPUT${none}:"
+for out in output/*; do 
+    echo "file $out:"
+    cat $out
+done
+echo
+
+echo "${yellow}TIME${none}:"
+echo "file $timing_file:"
+cat $timing_file
+echo
+
+echo "${blue}PROFILE${none}:"
+for prof in mrsprof/*; do 
+    echo "file $prof:"
+    cat $prof
+done
+echo
+
