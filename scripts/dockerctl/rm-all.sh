@@ -15,7 +15,7 @@ for machine in $machines; do
     containers=$(docker ps -aq | xargs)
 
     for container in $containers; do
-        echo "KILLING CONTAINER ${red}${container}${none} ON MACHINE ${blue}${mahcine}${none}"
+        echo "KILLING CONTAINER ${red}${container}${none} ON MACHINE ${blue}${machine}${none}"
         docker kill $container
         docker rm --force $container
     done

@@ -51,7 +51,7 @@ python $job -I $role $([ $role = Master ] \
         --mrs-timing-file ${timing_file} --mrs-profile --mrs-verbose
 
 echo "${green}OUTPUT${none}:"
-for out in output/*; do 
+for out in output/* ; do 
     echo "file $out:"
     cat $out
 done
@@ -62,10 +62,12 @@ echo "file $timing_file:"
 cat $timing_file
 echo
 
-echo "${blue}PROFILE${none}:"
-for prof in mrsprof/*; do 
-    echo "file $prof:"
-    cat $prof
-done
-echo
+#echo "${blue}PROFILE${none}:"
+#for prof in mrsprof/* ; do 
+    #echo "file $prof:"
+    #cat $prof
+#done
+#echo
 
+# keep container running for 5 minutes
+sleep 300
