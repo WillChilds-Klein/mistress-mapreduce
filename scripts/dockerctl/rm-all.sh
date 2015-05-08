@@ -7,7 +7,7 @@ green="${esc}[32m";
 blue="${esc}[34m";
 none="${esc}[0m";
 
-machines=$(docker-machine ls -q | grep -e '^[remote][master]*')
+machines=$(docker-machine ls -q | grep -e '^[remote][master]*' | xargs)
 
 for machine in $machines; do
     docker-machine active $machine

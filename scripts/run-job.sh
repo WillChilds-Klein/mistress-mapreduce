@@ -7,7 +7,7 @@ help="USAGE: $0 [-s master_host XOR -i input_file -o output_dir] [-t timing_file
 timing_file=""
 role="Master"
 input_file="input_paths.txt"
-output_dir="output/"
+output_dir="output"
 master_host=""
 
 OPTIND=1
@@ -22,7 +22,7 @@ while getopts "h?s:i:o:t:" opt; do
     s)  master_host=$OPTARG
         role="Slave"
         ;;
-    o)  out_dir=$OPTARG
+    o)  output_dir=$OPTARG
         ;;
     i)  input_file=$OPTARG
         ;;
@@ -51,7 +51,7 @@ python $job -I $role $([ $role = Master ] \
         --mrs-timing-file ${timing_file} --mrs-profile --mrs-verbose
 
 echo "${green}OUTPUT${none}:"
-for out in output/* ; do 
+for out in ${output_dir}/* ; do 
     echo "file $out:"
     cat $out
 done
